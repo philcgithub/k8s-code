@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: debug
+  labels:
+    name: debug
+spec:
+  clusterIP: None
+  selector:
+    name: debug
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: debug
+spec:
+  serviceName: "debug"
+  replicas: 1
+  selector:
+    matchLabels:
+      name: debug
+  template:
+    metadata:
+      labels:
+        name: debug
+    spec:
+      containers:
+      - name: debug
+        image: httpd
+        volumeMounts:
+        - name: mymount
+          mountPath: /mymount
+          readOnly: false
+  volumeClaimTemplates:
+  - metadata:
+      name: mymount
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: "1Gi"
